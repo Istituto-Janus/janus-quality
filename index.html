@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portale operativo Janus Quality & Accreditamenti">
+  <meta name="theme-color" content="#101d3f">
+  <title>Janus Quality & Accreditamenti</title>
+  <link rel="icon" href="assets/janus-logo.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar" aria-label="Navigazione principale">
+      <div class="sidebar-brand">
+        <img src="assets/janus-logo.png" alt="Janus - Istituto Superiore per la Formazione">
+      </div>
+
+      <nav>
+        <button class="nav-link active" data-view="dashboard"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
+        <button class="nav-link" data-view="requisiti"><span class="nav-icon">▣</span><span>Requisiti corsi</span></button>
+        <button class="nav-link" data-view="comparatore"><span class="nav-icon">⚖</span><span>Confronto corsi</span></button>
+        <button class="nav-link" data-view="calcolatore"><span class="nav-icon">▦</span><span>Calcolatore aula</span></button>
+        <button class="nav-link" data-view="checklist"><span class="nav-icon">☑</span><span>Checklist documenti</span></button>
+        <button class="nav-link" data-view="fonti"><span class="nav-icon">◫</span><span>Normativa e fonti</span></button>
+      </nav>
+
+      <div id="sidebarStats" class="sidebar-stats"></div>
+    </aside>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <button id="menuToggle" class="menu-toggle" aria-label="Apri menu">☰</button>
+        <div class="topbar-brand">
+          <img src="assets/janus-logo.png" alt="Janus">
+          <div>
+            <strong>Janus Quality</strong>
+            <span>Qualità e accreditamenti</span>
+          </div>
+        </div>
+        <button class="help-link" data-go="fonti">Guida e fonti</button>
+      </header>
+
+      <main class="content">
+        <section id="dashboard" class="view active-view">
+          <div class="welcome-row">
+            <div>
+              <p class="eyebrow">Portale operativo</p>
+              <h1>Benvenuto in Janus Quality & Accreditamenti</h1>
+              <p class="lead">Strumento per la gestione dei requisiti di accreditamento, della documentazione e delle verifiche preliminari.</p>
+            </div>
+            <article class="total-card">
+              <span class="feature-icon">▤</span>
+              <div><small>Documenti complessivi</small><strong id="totalRequirements">43</strong><span>requisiti da verificare</span></div>
+              <button data-go="checklist">Vedi checklist completa →</button>
+            </article>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <span class="feature-icon">▣</span><h2>Requisiti corsi</h2>
+              <p>Consulta i requisiti strutturali e tecnologici per ciascuna tipologia di corso.</p>
+              <button class="primary-action" data-go="requisiti">Vai ai requisiti →</button>
+            </article>
+            <article class="feature-card">
+              <span class="feature-icon">⚖</span><h2>Confronto corsi</h2>
+              <p>Confronta requisiti e dotazioni tra percorsi finanziati e non finanziati.</p>
+              <button class="primary-action" data-go="comparatore">Confronta →</button>
+            </article>
+            <article class="feature-card">
+              <span class="feature-icon">▦</span><h2>Calcolatore aula</h2>
+              <p>Valuta capienza e postazioni disponibili in rapporto ai valori indicativi.</p>
+              <button class="primary-action" data-go="calcolatore">Apri calcolatore →</button>
+            </article>
+            <article class="feature-card">
+              <span class="feature-icon">☑</span><h2>Checklist documenti</h2>
+              <p>Controlla lo stato dei documenti e accedi direttamente alle evidenze su Drive.</p>
+              <button class="primary-action" data-go="checklist">Apri checklist →</button>
+            </article>
+          </div>
+
+          <div class="dashboard-lower">
+            <article class="feature-card compact">
+              <span class="feature-icon">◫</span><h2>Normativa e fonti</h2>
+              <p>Consulta fonti regionali, nazionali e documenti ufficiali.</p>
+              <button class="primary-action" data-go="fonti">Vai alle fonti →</button>
+            </article>
+            <article class="info-card">
+              <span class="feature-icon">i</span>
+              <div><h2>Informazioni importanti</h2><p>I dati sono strumenti operativi e devono essere validati sulle fonti ufficiali applicabili. La responsabilità della verifica resta in capo all'ente richiedente.</p></div>
+            </article>
+            <article class="update-card">
+              <span class="feature-icon">◷</span><h2>Ultimo aggiornamento</h2><p>18 luglio 2026</p><p>Versione 1.2</p><strong>Dati da validare</strong>
+            </article>
+          </div>
+
+          <div id="dashboardCards" class="course-summary-grid"></div>
+        </section>
+
+        <section id="requisiti" class="view">
+          <div class="section-heading"><div><p class="eyebrow">Catalogo</p><h1>Requisiti per tipologia</h1><p>Consulta superfici, postazioni, dotazioni e accessibilità.</p></div></div>
+          <div class="filters panel">
+            <label>Tipologia<select id="courseFilter"></select></label>
+            <label>Regime<select id="fundingFilter"><option value="tutti">Tutti</option><option value="finanziato">Finanziato</option><option value="non-finanziato">Non finanziato</option></select></label>
+          </div>
+          <div id="requirementsDetail"></div>
+        </section>
+
+        <section id="comparatore" class="view">
+          <div class="section-heading"><div><p class="eyebrow">Analisi comparativa</p><h1>Confronto corsi</h1><p>Metti a confronto due percorsi e individua subito le differenze.</p></div></div>
+          <div id="compareControls" class="compare-controls panel"></div>
+          <div class="table-wrap panel"><table><thead><tr><th>Requisito</th><th id="compareHead1">Corso 1</th><th id="compareHead2">Corso 2</th></tr></thead><tbody id="compareBody"></tbody></table></div>
+        </section>
+
+        <section id="calcolatore" class="view">
+          <div class="section-heading"><div><p class="eyebrow">Valutazione preliminare</p><h1>Calcolatore aula</h1><p>Verifica la compatibilità quantitativa di uno spazio formativo.</p></div></div>
+          <form id="calculatorForm" class="form-card panel">
+            <label>Superficie disponibile (mq)<input id="roomArea" type="number" min="1" step="0.5" required placeholder="Es. 60"></label>
+            <label>Numero postazioni PC<input id="pcCount" type="number" min="0" required placeholder="Es. 15"></label>
+            <label>Numero postazioni laboratorio<input id="labCount" type="number" min="0" required placeholder="Es. 10"></label>
+            <button class="primary-action" type="submit">Valuta aula</button>
+          </form>
+          <div id="calculatorResults" class="results-grid"></div>
+        </section>
+
+        <section id="checklist" class="view">
+          <div class="section-heading action-heading"><div><p class="eyebrow">Controllo operativo</p><h1>Checklist documenti</h1><p>Stato, priorità, responsabili e collegamenti diretti alle evidenze.</p></div><button id="resetChecklist" class="secondary-action">Azzera spunte locali</button></div>
+          <div class="checklist-toolbar panel">
+            <label>Area<select id="checklistArea"><option value="tutte">Tutte</option></select></label>
+            <label>Stato<select id="checklistStatus"><option value="tutti">Tutti</option></select></label>
+            <label class="search-field">Ricerca<input id="checklistSearch" type="search" placeholder="ID, requisito, documento..."></label>
+          </div>
+          <div id="checklistSummary" class="checklist-summary"></div>
+          <div id="checklistItems" class="checklist"></div>
+        </section>
+
+        <section id="fonti" class="view">
+          <div class="section-heading"><div><p class="eyebrow">Tracciabilità</p><h1>Normativa e fonti</h1><p>Riferimenti ufficiali e documentazione di supporto.</p></div></div>
+          <div class="notice panel"><strong>Nota metodologica</strong><p>Ogni requisito deve essere associato a una fonte ufficiale, alla data di verifica, all'ambito territoriale e al responsabile della validazione.</p></div>
+          <div id="sourcesList" class="sources-list"></div>
+        </section>
+      </main>
+
+      <footer>© 2026 Istituto Janus · Portale Quality & Accreditamenti</footer>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
