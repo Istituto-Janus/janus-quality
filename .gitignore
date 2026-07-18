@@ -1,0 +1,44 @@
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+tmp/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+
+# Local development servers
+.http-server/
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Local data and exports
+data/local/
+exports/
+
+# Backup files
+*.bak
+*~
