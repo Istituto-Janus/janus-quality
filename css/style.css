@@ -1,0 +1,25 @@
+:root {
+  --navy: #111e40;
+  --navy-2: #182957;
+  --blue: #7690c5;
+  --blue-strong: #5477c5;
+  --blue-soft: #edf3ff;
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --text: #17254b;
+  --muted: #65718f;
+  --line: #dce3f0;
+  --green: #38b875;
+  --yellow: #f0bd45;
+  --orange: #ee8736;
+  --gray: #aeb8c8;
+  --danger: #b55151;
+  --shadow: 0 12px 30px rgba(24, 41, 87, .08);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.app-shell { min-height: 100vh; display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+.sidebar { position
