@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" role="img" aria-labelledby="title desc">
+  <title id="title">Janus - Istituto Superiore per la Formazione</title>
+  <desc id="desc">Marchio Janus con monogramma nu e denominazione istituzionale.</desc>
+  <rect width="900" height="900" fill="none"/>
+  <g font-family="Inter, Arial, Helvetica, sans-serif">
+    <text x="450" y="210" text-anchor="middle" font-size="140" font-weight="800" fill="#202745">Janus</text>
+    <text x="450" y="560" text-anchor="middle" font-size="390" font-weight="800" letter-spacing="-70" fill="#7f94c0">nu</text>
+    <text x="450" y="700" text-anchor="middle" font-size="62" font-weight="500" fill="#202745">Istituto Superiore</text>
+    <text x="450" y="775" text-anchor="middle" font-size="62" font-weight="500" fill="#202745">per la Formazione</text>
+  </g>
+</svg>
