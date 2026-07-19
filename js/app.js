@@ -115,6 +115,58 @@ function renderChecklist(){
     localStorage.setItem('janusChecklist',JSON.stringify(saved));
   }));
 }
+
+function escapeHtml(value){
+  return String(value??'').replace(/[&<>"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+}
+
+function renderSituationSummary(){
+  const knownStatuses=['Disponibile','Parziale','Da acquisire','Da predisporre','Da verificare','Non avviato'];
+  const statusCounts=Object.fromEntries(knownStatuses.map(status=>[status,data.checklist.filter(item=>item.status===status).length]));
+  const otherStatuses=data.checklist.filter(item=>!knownStatuses.includes(item.status)).length;
+  const blockers=data.checklist.filter(item=>item.priority==='Bloccante').length;
+  const highPriority=data.checklist.filter(item=>item.priority==='Alta').length;
+  const linked=data.checklist.filter(item=>item.url).length;
+  const incompleteStatuses=new Set(['Parziale','Da acquisire','Da predisporre','Da verificare','Non avviato']);
+
+  const areas=[...new Set(data.checklist.map(item=>item.area||'Area non indicata'))].map(area=>{
+    const items=data.checklist.filter(item=>(item.area||'Area non indicata')===area);
+    return {area,total:items.length,available:items.filter(item=>item.status==='Disponibile').length,partial:items.filter(item=>item.status==='Parziale').length,incomplete:items.filter(item=>incompleteStatuses.has(item.status)||!knownStatuses.includes(item.status)).length,blockers:items.filter(item=>item.priority==='Bloccante').length};
+  }).sort((a,b)=>a.area.localeCompare(b.area,'it'));
+
+  const owners=[...new Set(data.checklist.map(item=>item.owner||'Responsabile non indicato'))].map(owner=>{
+    const items=data.checklist.filter(item=>(item.owner||'Responsabile non indicato')===owner);
+    return {owner,total:items.length,urgent:items.filter(item=>['Bloccante','Alta'].includes(item.priority)).length};
+  }).sort((a,b)=>b.urgent-a.urgent||b.total-a.total||a.owner.localeCompare(b.owner,'it'));
+
+  const priorityOrder={Bloccante:0,Alta:1,Media:2};
+  const statusOrder={'Non avviato':0,'Da acquisire':1,'Da predisporre':2,'Da verificare':3,Parziale:4};
+  const criticalities=data.checklist.filter(item=>item.status!=='Disponibile').sort((a,b)=>(priorityOrder[a.priority]??99)-(priorityOrder[b.priority]??99)||(statusOrder[a.status]??99)-(statusOrder[b.status]??99)||String(a.area||'').localeCompare(String(b.area||''),'it')||String(a.id||'').localeCompare(String(b.id||''),'it'));
+
+  document.getElementById('situationSummaryContent').innerHTML=`
+    <div class="summary-metrics">
+      <div><strong>${data.checklist.length}</strong><span>Requisiti totali</span></div><div><strong>${statusCounts.Disponibile}</strong><span>Disponibili</span></div><div><strong>${statusCounts.Parziale}</strong><span>Parziali</span></div><div><strong>${statusCounts['Da acquisire']}</strong><span>Da acquisire</span></div><div><strong>${statusCounts['Da predisporre']}</strong><span>Da predisporre</span></div><div><strong>${statusCounts['Da verificare']}</strong><span>Da verificare</span></div><div><strong>${statusCounts['Non avviato']}</strong><span>Non avviati</span></div><div><strong>${blockers}</strong><span>Priorità bloccante</span></div><div><strong>${highPriority}</strong><span>Priorità alta</span></div><div><strong>${linked}</strong><span>Con documento collegato</span></div><div><strong>${data.checklist.length-linked}</strong><span>Senza documento collegato</span></div>${otherStatuses?`<div><strong>${otherStatuses}</strong><span>Altri stati</span></div>`:''}
+    </div>
+    <section class="summary-section"><h3>Situazione per area</h3><div class="summary-table-wrap"><table><thead><tr><th>Area</th><th>Totale</th><th>Disponibili</th><th>Parziali</th><th>Da completare</th><th>Bloccanti</th></tr></thead><tbody>${areas.map(item=>`<tr><th>${escapeHtml(item.area)}</th><td>${item.total}</td><td>${item.available}</td><td>${item.partial}</td><td>${item.incomplete}</td><td>${item.blockers}</td></tr>`).join('')}</tbody></table></div></section>
+    <section class="summary-section"><h3>Carico per responsabile</h3><div class="summary-owner-grid">${owners.map(item=>`<div><strong>${escapeHtml(item.owner)}</strong><span>${item.total} requisiti · ${item.urgent} bloccanti o ad alta priorità</span></div>`).join('')}</div></section>
+    <section class="summary-section"><h3>Criticità prioritarie</h3><div class="summary-criticalities">${criticalities.map(item=>`<article class="summary-criticality"><div class="summary-criticality-head"><span class="check-id">${escapeHtml(item.id||'ID non indicato')}</span><span class="status-pill ${statusClass(item.status)}">${escapeHtml(item.status||'Stato non indicato')}</span></div><h4>${escapeHtml(item.requirement||'Requisito non indicato')}</h4><div class="check-meta"><span>${escapeHtml(item.area||'Area non indicata')}</span><span>Priorità: ${escapeHtml(item.priority||'Non indicata')}</span><span>Responsabile: ${escapeHtml(item.owner||'Non indicato')}</span></div>${item.note?`<p>${escapeHtml(item.note)}</p>`:''}${item.url?`<a class="document-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">Apri ${escapeHtml(item.document||'documento')}</a>`:''}</article>`).join('')||'<p>Nessuna criticità rilevata.</p>'}</div></section>`;
+}
+
+function openSituationSummary(){
+  renderSituationSummary();
+  const modal=document.getElementById('situationSummaryModal');
+  modal.hidden=false;
+  document.body.classList.add('modal-open');
+  document.getElementById('closeSituationSummary').focus();
+}
+
+function closeSituationSummary(){
+  const modal=document.getElementById('situationSummaryModal');
+  modal.hidden=true;
+  document.body.classList.remove('modal-open');
+  document.getElementById('openSituationSummary').focus();
+}
+
 function renderSources(){
   document.getElementById('sourcesList').innerHTML=data.sources.map(source=>`<article class="source-card"><h3>${source.title}</h3><div class="source-meta">${source.scope}</div><p>${source.note}</p><span class="badge">${source.status}</span></article>`).join('');
 }
@@ -126,6 +178,10 @@ function initializeListeners(){
   courseFilter.addEventListener('change',renderRequirements);
   fundingFilter.addEventListener('change',renderRequirements);
   document.getElementById('calculatorForm').addEventListener('submit',handleCalculator);
+  document.getElementById('openSituationSummary').addEventListener('click',openSituationSummary);
+  document.getElementById('closeSituationSummary').addEventListener('click',closeSituationSummary);
+  document.getElementById('situationSummaryModal').addEventListener('click',event=>{if(event.target===event.currentTarget)closeSituationSummary();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.getElementById('situationSummaryModal').hidden)closeSituationSummary();});
   document.getElementById('resetChecklist').addEventListener('click',()=>{
     localStorage.removeItem('janusChecklist');
     renderChecklist();
